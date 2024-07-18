@@ -1,0 +1,11 @@
+@font-face {
+  font-family: yekan;
+  src: url('../font/BYekan/BYekan+.ttf');
+}
+* {
+  font-family: yekan;
+}
+
+option {
+  color: black;
+}
