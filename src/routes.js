@@ -22,6 +22,10 @@ import PermissionManagement from "subroutes/admin/Access_managment/Access_managm
 import CompanyManagement from "subroutes/personel/Add_new_company/company_mangment";
 import CategoryManagement from "subroutes/personel/add_category/CategoryManagement";
 import PositionManagement from "subroutes/personel/add_position/PositionManagement";
+import EmployeeList from "subroutes/personel/Personellist/EmployeeList";
+import NewEmployeeForm from "subroutes/personel/Add_personel/NewEmployeeForm";
+import EmployeeSettlement from "subroutes/personel/Personel_sattlement/Employee_sattlment";
+import ContractualItemsPage from "subroutes/personel/Registration_contractual_items/ContractualItems";
 
 const routes = [
   {
@@ -98,17 +102,22 @@ const routes = [
       {
         name: " ثبت پرسنل جدید ",
         path: "/register-personel",
-        component: MainDashboard,
+        component: NewEmployeeForm,
       },
       {
         name: " لیست پرسنل ",
         path: "/personel-list",
-        component: MainDashboard,
+        component: EmployeeList,
       },
       {
         name: " تسویه پرسنل ",
         path: "/personel-sattlement",
-        component: MainDashboard,
+        component: EmployeeSettlement,
+      },
+      {
+        name: " ثبت موارد قراردادی ",
+        path: "/Registration_contractual_items",
+        component: ContractualItemsPage,
       },
       {
         name: " افزودن شیفت کاری ",

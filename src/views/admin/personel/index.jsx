@@ -35,9 +35,9 @@ function Personel() {
   const bgColors = [
     "rgba(255, 0, 0, 0.8)",      // red
     "rgba(65, 105, 225, 0.8)",   // blue
-    "rgba(0, 255, 255, 0.8)",    // cyan
+    // "rgba(0, 255, 255, 0.8)",    // cyan
     "rgba(0, 255, 0, 0.8)",      // green
-    "rgba(255, 255, 0, 0.8)",    // yellow
+    // "rgba(255, 255, 0, 0.8)",    // yellow
     "rgba(255, 105, 180, 0.8)",  // pink
     "rgba(255, 165, 0, 0.8)",    // orange
   ];

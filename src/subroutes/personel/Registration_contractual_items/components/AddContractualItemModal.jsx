@@ -6,9 +6,9 @@ import {
 const AddContractualItemModal = ({ isOpen, onClose, onAddItem }) => {
   const [year, setYear] = useState('');
   const [childAllowance, setChildAllowance] = useState('');
-  const [childBenefit, setChildBenefit] = useState('');
+  const [spouseAllowance, setSpouseAllowance] = useState('');
+  const [insuranceAllowance, setInsuranceAllowance] = useState('');
   const [housingAllowance, setHousingAllowance] = useState('');
-  const [marriageAllowance, setMarriageAllowance] = useState('');
   const [laborBenefit, setLaborBenefit] = useState('');
 
   const handleAddItem = () => {
@@ -16,18 +16,18 @@ const AddContractualItemModal = ({ isOpen, onClose, onAddItem }) => {
       id: Date.now(),
       year,
       childAllowance,
-      childBenefit,
+      spouseAllowance,
+      insuranceAllowance,
       housingAllowance,
-      marriageAllowance,
       laborBenefit
     };
     onAddItem(newItem);
     onClose();
     setYear('');
     setChildAllowance('');
-    setChildBenefit('');
+    setSpouseAllowance('');
+    setInsuranceAllowance('');
     setHousingAllowance('');
-    setMarriageAllowance('');
     setLaborBenefit('');
   };
 
@@ -53,21 +53,21 @@ const AddContractualItemModal = ({ isOpen, onClose, onAddItem }) => {
             </NumberInput>
           </FormControl>
           <FormControl mb={4}>
-            <FormLabel>حق فرزند</FormLabel>
-            <NumberInput value={childBenefit} onChange={(valueString) => setChildBenefit(valueString)}>
-              <NumberInputField placeholder="حق فرزند" />
+            <FormLabel>حق همسر</FormLabel>
+            <NumberInput value={spouseAllowance} onChange={(valueString) => setSpouseAllowance(valueString)}>
+              <NumberInputField placeholder="حق همسر" />
+            </NumberInput>
+          </FormControl>
+          <FormControl mb={4}>
+            <FormLabel>حق بیمه</FormLabel>
+            <NumberInput value={insuranceAllowance} onChange={(valueString) => setInsuranceAllowance(valueString)}>
+              <NumberInputField placeholder="حق بیمه" />
             </NumberInput>
           </FormControl>
           <FormControl mb={4}>
             <FormLabel>حق مسکن</FormLabel>
             <NumberInput value={housingAllowance} onChange={(valueString) => setHousingAllowance(valueString)}>
               <NumberInputField placeholder="حق مسکن" />
-            </NumberInput>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>حق تاهل</FormLabel>
-            <NumberInput value={marriageAllowance} onChange={(valueString) => setMarriageAllowance(valueString)}>
-              <NumberInputField placeholder="حق تاهل" />
             </NumberInput>
           </FormControl>
           <FormControl mb={4}>
