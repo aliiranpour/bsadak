@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 // Custom Components
 import { ItemContent } from 'components/menu/ItemContent';
-import { SidebarResponsive } from 'components/sidebar/Sidebar';
+import  SidebarResponsive  from 'components/sidebar/components/SidebarResponsive';
 import PropTypes from 'prop-types';
 import React from 'react';
 // Assets

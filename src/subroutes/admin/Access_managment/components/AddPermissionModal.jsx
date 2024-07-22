@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Input, Box
 } from '@chakra-ui/react';
 
 const AddPermissionModal = ({ isOpen, onClose, onAddPermission, allPermissions }) => {
-  const [newPermission, setNewPermission] = useState('');
-  const [error, setError] = useState('');
+  const { register, handleSubmit, reset, setError, formState: { errors } } = useForm();
 
-  const handleAddPermission = () => {
+  const onSubmit = (data) => {
+    const { newPermission } = data;
     if (allPermissions.includes(newPermission)) {
-      setError('این دسترسی از قبل وجود دارد!');
+      setError('newPermission', {
+        type: 'manual',
+        message: 'این دسترسی از قبل وجود دارد!',
+      });
     } else {
       onAddPermission(newPermission);
-      setNewPermission('');
-      setError('');
+      reset();
       onClose();
     }
   };
@@ -21,24 +24,26 @@ const AddPermissionModal = ({ isOpen, onClose, onAddPermission, allPermissions }
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bgColor={'green.100'}>
         <ModalHeader>افزودن دسترسی</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Input
-            placeholder="نام دسترسی"
-            value={newPermission}
-            onChange={(e) => setNewPermission(e.target.value)}
-            mb={2}
-          />
-          {error && <Box color="red.500">{error}</Box>}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Input
+              placeholder="نام دسترسی"
+              {...register('newPermission', { required: 'نام دسترسی الزامی است' })}
+              mb={2}
+              outline='1px solid black'
+            />
+            {errors.newPermission && <Box color="red.500">{errors.newPermission.message}</Box>}
+            <ModalFooter>
+              <Button variant="ghost" onClick={onClose}>لغو</Button>
+              <Button colorScheme="teal" mr={3} type="submit" borderRadius={5}>
+                افزودن
+              </Button>
+            </ModalFooter>
+          </form>
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="teal" mr={3} onClick={handleAddPermission}>
-            افزودن
-          </Button>
-          <Button variant="ghost" onClick={onClose}>لغو</Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

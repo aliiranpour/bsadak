@@ -23,7 +23,7 @@ const EditPermissionModal = ({ isOpen, onClose, onEditPermission, initialPermiss
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bgColor={'gray.200'}>
         <ModalHeader>ویرایش دسترسی</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -36,10 +36,10 @@ const EditPermissionModal = ({ isOpen, onClose, onEditPermission, initialPermiss
           {error && <Box color="red.500">{error}</Box>}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSaveChanges}>
+          <Button variant="ghost" colorScheme='aquablack' onClick={onClose} bgColor={'blackAlpha.800'} borderRadius={5} color={'white'} me={5} >لغو</Button>
+          <Button colorScheme="green" mr={3} onClick={handleSaveChanges} bgColor={'green.300'} borderRadius={5}>
             ذخیره
           </Button>
-          <Button variant="ghost" onClick={onClose}>لغو</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

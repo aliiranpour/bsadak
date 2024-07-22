@@ -26,183 +26,179 @@ import EmployeeList from "subroutes/personel/Personellist/EmployeeList";
 import NewEmployeeForm from "subroutes/personel/Add_personel/NewEmployeeForm";
 import EmployeeSettlement from "subroutes/personel/Personel_sattlement/Employee_sattlment";
 import ContractualItemsPage from "subroutes/personel/Registration_contractual_items/ContractualItems";
+import ShiftManagement from "subroutes/personel/add_shift/add_shift";
 
 const routes = [
   {
     name: "پیشخوان",
     layout: "/admin",
     path: "/counter",
-    icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: MainDashboard,
   },
   {
     name: "ادمین",
     layout: "/admin",
-    path: "/admiin",
+    path: "/admin",
     icon: (
       <Icon
         as={MdOutlineShoppingCart}
-        width='20px'
-        height='20px'
-        color='inherit'
+        width="20px"
+        height="20px"
+        color="inherit"
       />
     ),
-    component: Admin ,
-    secondary: true,
     subRoutes: [
       {
-        name: " مدیریت کاربران سایت ",
+        name: "مدیریت کاربران سایت",
         path: "/member_managment",
-        component: Member_managment ,
+        component: Member_managment,
       },
       {
-        name: " مدیریت سطوح کاربری ",
+        name: "مدیریت سطوح کاربری",
         path: "/member-level-managment",
-        component: User_level_managment ,
+        component: User_level_managment,
       },
       {
-        name: " مدیریت دسترسی ها ",
+        name: "مدیریت دسترسی ها",
         path: "/access-managing",
         component: PermissionManagement,
-      },   
+      },
       {
-        name: " تنظیمات پیشفرض ",
+        name: "تنظیمات پیشفرض",
         path: "/default-setting",
         component: MainDashboard,
-      }
-    ]
+      },
+    ],
   },
   {
     name: "پرسنل",
     layout: "/admin",
-    icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,
     path: "/personel",
-    component: Personel,
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
     subRoutes: [
       {
-        name: " مدیریت پرسنل ",
+        name: "مدیریت پرسنل",
         path: "/personel_managing",
         component: MainDashboard,
       },
       {
-        name: " افزودن شرکت جدید ",
+        name: "افزودن شرکت جدید",
         path: "/add-company",
         component: CompanyManagement,
       },
       {
-        name: " افزودن دسته بندی ",
+        name: "افزودن دسته بندی",
         path: "/add-category",
         component: CategoryManagement,
-      },   
+      },
       {
-        name: " افزودن سمت ",
+        name: "افزودن سمت",
         path: "/add-positin",
         component: PositionManagement,
       },
       {
-        name: " ثبت پرسنل جدید ",
+        name: "ثبت پرسنل جدید",
         path: "/register-personel",
         component: NewEmployeeForm,
       },
       {
-        name: " لیست پرسنل ",
+        name: "لیست پرسنل",
         path: "/personel-list",
         component: EmployeeList,
       },
       {
-        name: " تسویه پرسنل ",
+        name: "تسویه پرسنل",
         path: "/personel-sattlement",
         component: EmployeeSettlement,
       },
       {
-        name: " ثبت موارد قراردادی ",
+        name: "ثبت موارد قراردادی",
         path: "/Registration_contractual_items",
         component: ContractualItemsPage,
       },
       {
-        name: " افزودن شیفت کاری ",
+        name: "افزودن شیفت کاری",
         path: "/add-shift",
-        component: MainDashboard,
-      },      
+        component: ShiftManagement,
+      },
       {
-        name: " حضور غیاب ",
+        name: "حضور غیاب",
         path: "/present-absence",
         component: MainDashboard,
-      },      
+      },
       {
-        name: " لیست حضور غیاب ",
+        name: "لیست حضور غیاب",
         path: "/present-absence-list",
         component: MainDashboard,
-      },      
+      },
       {
-        name: " افزودن اضافه کار ",
+        name: "افزودن اضافه کار",
         path: "/add-extra-work",
         component: MainDashboard,
-      },      
+      },
       {
-        name: " ثبت جریمه ",
+        name: "ثبت جریمه",
         path: "/register-fine",
         component: MainDashboard,
-      },   
+      },
       {
-        name: " لیست جریمه‌ها ",
+        name: "لیست جریمه‌ها",
         path: "/fines-list",
         component: MainDashboard,
       },
       {
-        name: " ثبت تعطیلی ",
+        name: "ثبت تعطیلی",
         path: "/register-holiday",
         component: MainDashboard,
       },
       {
-        name: " محاسبه کل کارکرد ",
+        name: "محاسبه کل کارکرد",
         path: "/calculate-total-function",
         component: MainDashboard,
       },
       {
-        name: " لیست کارکردها ",
+        name: "لیست کارکردها",
         path: "/functions-list",
         component: MainDashboard,
       },
       {
-        name: " ثبت پرداختی ",
+        name: "ثبت پرداختی",
         path: "/register-payment",
         component: MainDashboard,
       },
       {
-        name: " لیست پرداختی‌ها ",
+        name: "لیست پرداختی‌ها",
         path: "/payments-list",
         component: MainDashboard,
       },
-    ]
+    ],
   },
   {
     name: "قرارداد",
     layout: "/admin",
     path: "/contract",
-    icon: <Icon as={MdPerson} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
     component: Profile,
-    subRoutes: [],
   },
   {
     name: "بارنامه",
     layout: "/admin",
     path: "/waybill",
-    icon: <Icon as={MdLock} width='20px' height='20px' color='inherit' />,
-    component: MainDashboard,
+    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     subRoutes: [
       {
-        name: " بارنامه سوخت ",
+        name: "بارنامه سوخت",
         path: "/fuel-paybill",
         component: MainDashboard,
       },
       {
-        name: " بارنامه سیمان ",
+        name: "بارنامه سیمان",
         path: "/Cement-paybill",
         component: MainDashboard,
       },
       {
-        name: " بارنامه قیر ",
+        name: "بارنامه قیر",
         path: "/bitumen-paybill",
         component: MainDashboard,
       },
@@ -212,9 +208,8 @@ const routes = [
     name: "حسابداری",
     layout: "/admin",
     path: "/accounting",
-    icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: MainDashboard,
-    subRoutes: [],
   },
 ];
 
