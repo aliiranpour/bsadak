@@ -1,67 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import {
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
-  Button, FormControl, FormLabel, Input, Textarea, Select
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, Textarea, Text
 } from '@chakra-ui/react';
+import axios from 'axios';
 
-const EditCategoryModal = ({ isOpen, onClose, onEditCategory, initialCategory, companies }) => {
-  const [category, setCategory] = useState(initialCategory);
+const EditCategoryModal = ({ isOpen, onClose, onEditCategory, initialCategory }) => {
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCategory(prevState => ({
-      ...prevState, [name]: value
-    }));
-  };
+  useEffect(() => {
+    setValue('Name', initialCategory.Name);
+    setValue('Caption', initialCategory.Caption);
+  }, [initialCategory, setValue]);
 
-  const handleSubmit = () => {
-    onEditCategory(category);
-    onClose();
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.patch(`https://api.bsadak.ir/api/category/${initialCategory._id}`, {
+        Name: data.Name,
+        Caption: data.Caption
+      }, {
+        headers: {
+          'Authorization': localStorage.getItem('accessToken'),
+          'Content-Type': 'application/json'
+        }
+      });
+      onEditCategory(response.data);
+      reset();
+      onClose();
+    } catch (error) {
+      console.error('Error editing category', error);
+    }
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bgColor={'gray.300'}>
         <ModalHeader>ویرایش دسته بندی</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FormControl mb={4}>
-            <FormLabel>نام شرکت</FormLabel>
-            <Select
-              name="company"
-              value={category.company}
-              onChange={handleChange}
-            >
-              <option value="" disabled>انتخاب شرکت</option>
-              {companies.map(company => (
-                <option key={company.id} value={company.name}>{company.name}</option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>نام دسته بندی</FormLabel>
-            <Input
-              name="name"
-              value={category.name}
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>توضیحات</FormLabel>
-            <Textarea
-              name="description"
-              value={category.description}
-              onChange={handleChange}
-            />
-          </FormControl>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormControl mb={4}>
+              <FormLabel>نام دسته بندی</FormLabel>
+              <Input
+                {...register('Name', { required: 'نام دسته بندی الزامی است' })}
+                placeholder="نام دسته بندی"
+                outline={'1px solid black'}
+              />
+              {errors.Name && <Text color="red.500">{errors.Name.message}</Text>}
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>توضیحات</FormLabel>
+              <Textarea
+                {...register('Caption', { required: 'توضیحات الزامی است' })}
+                placeholder="توضیحات"
+                outline={'1px solid black'}
+              />
+              {errors.Caption && <Text color="red.500">{errors.Caption.message}</Text>}
+            </FormControl>
+            <ModalFooter>
+              <Button onClick={onClose} bgColor={'blackAlpha.300'} borderRadius={5}>
+                لغو
+              </Button>
+              <Button colorScheme="teal" type="submit" ml={5} bgColor={'green.300'} borderRadius={5}>
+                ذخیره
+              </Button>
+            </ModalFooter>
+          </form>
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
-            ذخیره
-          </Button>
-          <Button variant="ghost" onClick={onClose}>لغو</Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

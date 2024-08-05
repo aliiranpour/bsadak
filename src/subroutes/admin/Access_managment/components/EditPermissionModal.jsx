@@ -2,21 +2,36 @@ import React, { useState, useEffect } from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Input, Box
 } from '@chakra-ui/react';
+import axios from 'axios';
 
-const EditPermissionModal = ({ isOpen, onClose, onEditPermission, initialPermission, allPermissions }) => {
-  const [editedPermission, setEditedPermission] = useState(initialPermission);
+const EditPermissionModal = ({ isOpen, onClose, onEditPermission, permission }) => {
+  const [editedPermission, setEditedPermission] = useState(permission ? permission.Name : '');
+  const [editedCode, setEditedCode] = useState(permission ? permission.Code : '');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setEditedPermission(initialPermission);
-  }, [initialPermission]);
+    setEditedPermission(permission ? permission.Name : '');
+    setEditedCode(permission ? permission.Code : '');
+  }, [permission]);
 
-  const handleSaveChanges = () => {
-    if (allPermissions.includes(editedPermission) && editedPermission !== initialPermission) {
-      setError('این دسترسی از قبل وجود دارد!');
-    } else {
-      onEditPermission(editedPermission);
+  const handleSaveChanges = async () => {
+    try {
+      const response = await axios.patch(`https://api.bsadak.ir/api/admin/permision/${permission._id}`, {
+        Name: editedPermission,
+        Code: editedCode
+      }, {
+        headers: {
+          'Authorization': ` ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      onEditPermission(response.data);
       onClose();
+    } catch (error) {
+      console.error('Error editing permission', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      }
     }
   };
 
@@ -34,10 +49,16 @@ const EditPermissionModal = ({ isOpen, onClose, onEditPermission, initialPermiss
             mb={2}
           />
           {error && <Box color="red.500">{error}</Box>}
+          <Input
+            placeholder="کد دسترسی"
+            value={editedCode}
+            onChange={(e) => setEditedCode(e.target.value)}
+            mb={2}
+          />
         </ModalBody>
         <ModalFooter>
-          <Button variant="ghost" colorScheme='aquablack' onClick={onClose} bgColor={'blackAlpha.800'} borderRadius={5} color={'white'} me={5} >لغو</Button>
-          <Button colorScheme="green" mr={3} onClick={handleSaveChanges} bgColor={'green.300'} borderRadius={5}>
+          <Button variant="ghost" onClick={onClose}>لغو</Button>
+          <Button colorScheme="green" mr={3} onClick={handleSaveChanges}>
             ذخیره
           </Button>
         </ModalFooter>

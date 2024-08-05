@@ -1,84 +1,122 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import {
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Input, Select, Box
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Box,
+  Select
 } from '@chakra-ui/react';
+import { useForm } from 'react-hook-form';
+import axios from 'axios';
 
-const AddUserModal = ({ isOpen, onClose, onAddUser, positions }) => {
-  const { register, handleSubmit, reset, setError, formState: { errors } } = useForm();
+const AddUserModal = ({ isOpen, onClose, onAddUser }) => {
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
-    onAddUser(data);
-    reset();
-    onClose();
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post('https://api.bsadak.ir/api/admin/user', {
+        Name: data.Name,
+        LastName: data.LastName,
+        UserName: data.UserName,
+        Password: data.Password,
+        Phone: data.Phone,
+        Email: data.Email,
+        UserType: data.UserType
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('accessToken')
+        }
+      });
+      
+      onAddUser(response.data);
+      reset();
+      onClose();
+    } catch (error) {
+      console.error('Error adding user', error);
+    }
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent bgColor={'green.100'}>
-        <ModalHeader>افزودن کاربر</ModalHeader>
+        <ModalHeader>افزودن کاربر جدید</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Input
-              placeholder="نام"
-              {...register('first_name', { required: 'نام الزامی است' })}
-              mb={2}
-              outline='1px solid black'
-            />
-            {errors.first_name && <Box color="red.500">{errors.first_name.message}</Box>}
-
-            <Input
-              placeholder="نام خانوادگی"
-              {...register('last_name', { required: 'نام خانوادگی الزامی است' })}
-              mb={2}
-              outline='1px solid black'
-            />
-            {errors.last_name && <Box color="red.500">{errors.last_name.message}</Box>}
-
-            <Input
-              placeholder="نام کاربری"
-              {...register('username', { required: 'نام کاربری الزامی است' })}
-              mb={2}
-              outline='1px solid black'
-            />
-            {errors.username && <Box color="red.500">{errors.username.message}</Box>}
-
-            <Input
-              placeholder="رمز عبور"
-              {...register('password', { required: 'رمز عبور الزامی است' })}
-              mb={2}
-              outline='1px solid black'
-            />
-            {errors.password && <Box color="red.500">{errors.password.message}</Box>}
-
+            <FormControl mb={4} isInvalid={errors.Name}>
+              <FormLabel>نام</FormLabel>
+              <Input
+                placeholder="نام"
+                {...register('Name', { required: 'نام الزامی است' })}
+              />
+              {errors.Name && <Box color="red.500">{errors.Name.message}</Box>}
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.LastName}>
+              <FormLabel>نام خانوادگی</FormLabel>
+              <Input
+                placeholder="نام خانوادگی"
+                {...register('LastName', { required: 'نام خانوادگی الزامی است' })}
+              />
+              {errors.LastName && <Box color="red.500">{errors.LastName.message}</Box>}
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.UserName}>
+              <FormLabel>نام کاربری</FormLabel>
+              <Input
+                placeholder="نام کاربری"
+                {...register('UserName', { required: 'نام کاربری الزامی است' })}
+              />
+              {errors.UserName && <Box color="red.500">{errors.UserName.message}</Box>}
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.Password}>
+              <FormLabel>رمز عبور</FormLabel>
+              <Input
+                type="password"
+                placeholder="رمز عبور"
+                {...register('Password', { required: 'رمز عبور الزامی است' })}
+              />
+              {errors.Password && <Box color="red.500">{errors.Password.message}</Box>}
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.Phone}>
+              <FormLabel>تلفن</FormLabel>
               <Input
                 placeholder="تلفن"
-                {...register('tel', { required: 'تلفن الزامی است' })}
-                mb={2}
-                outline='1px solid black'
+                {...register('Phone', { required: 'تلفن الزامی است' })}
               />
-              {errors.tel && <Box color="red.500">{errors.tel.message}</Box>}
-            
-            <Select
-              placeholder="انتخاب موقعیت"
-              {...register('position', { required: 'موقعیت الزامی است' })}
-              mb={2}
-              outline='1px solid black'
-            >
-              {positions.map((pos) => (
-                <option key={pos.id} value={pos.name}>{pos.name}</option>
-              ))}
-            </Select>
-            {errors.position && <Box color="red.500">{errors.position.message}</Box>}
-
-
+              {errors.Phone && <Box color="red.500">{errors.Phone.message}</Box>}
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.Email}>
+              <FormLabel>ایمیل</FormLabel>
+              <Input
+                placeholder="ایمیل"
+                {...register('Email')}
+              />
+              {errors.Email && <Box color="red.500">{errors.Email.message}</Box>}
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.UserType}>
+              <FormLabel>نوع کاربر</FormLabel>
+              <Select placeholder="انتخاب نوع کاربر" {...register('UserType', { required: 'نوع کاربر الزامی است' })}>
+                <option value="6519afc1e63fd7c231098bfc">admin</option>
+                <option value="660d25c6502c48627dcedd85">مسئول پرداخت</option>
+                <option value="662dfec34d37a761b4973b23">حسابدار</option>
+                <option value="65f40c04fdf23f281bcb3fb8">مسئول حضور غیاب</option>
+              </Select>
+              {errors.UserType && <Box color="red.500">{errors.UserType.message}</Box>}
+            </FormControl>
             <ModalFooter>
-              <Button variant="ghost" onClick={onClose} borderRadius={5}>
+              <Button variant="ghost" onClick={onClose} ml={3} bgColor={'blackAlpha.300'} borderRadius={5} me={5}>
                 لغو
               </Button>
-              <Button colorScheme="green" mr={3} type="submit" borderRadius={5} bgColor="green.300" color="white">
+              <Button colorScheme="teal" type="submit" borderRadius={5} bgColor={'green.700'}>
                 افزودن
               </Button>
             </ModalFooter>
@@ -87,6 +125,6 @@ const AddUserModal = ({ isOpen, onClose, onAddUser, positions }) => {
       </ModalContent>
     </Modal>
   );
-}
+};
 
 export default AddUserModal;

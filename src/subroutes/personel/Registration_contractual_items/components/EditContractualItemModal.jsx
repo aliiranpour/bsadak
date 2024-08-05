@@ -1,86 +1,113 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, FormControl, FormLabel, NumberInput, NumberInputField, Select
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
+  Button, FormControl, FormLabel, NumberInput, NumberInputField, Select
 } from '@chakra-ui/react';
+import { useForm } from 'react-hook-form';
 
 const EditContractualItemModal = ({ isOpen, onClose, onEditItem, initialItem }) => {
-  const [item, setItem] = useState(initialItem);
+  const { register, handleSubmit, reset, setValue } = useForm({
+    defaultValues: initialItem
+  });
 
   useEffect(() => {
-    setItem(initialItem);
-  }, [initialItem]);
+    setValue('year', initialItem.year);
+    setValue('childAllowance', initialItem.childAllowance);
+    setValue('spouseAllowance', initialItem.spouseAllowance);
+    setValue('insuranceAllowance', initialItem.insuranceAllowance);
+    setValue('housingAllowance', initialItem.housingAllowance);
+    setValue('laborBenefit', initialItem.laborBenefit);
+  }, [initialItem, setValue]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setItem(prevState => ({
-      ...prevState, [name]: value
-    }));
-  };
-
-  const handleNumberChange = (name, value) => {
-    setItem(prevState => ({
-      ...prevState, [name]: value
-    }));
-  };
-
-  const handleSubmit = () => {
-    onEditItem(item);
+  const onSubmit = (data) => {
+    const updatedItem = {
+      ...initialItem,
+      year: data.year,
+      childAllowance: parseFloat(data.childAllowance),
+      spouseAllowance: parseFloat(data.spouseAllowance),
+      insuranceAllowance: parseFloat(data.insuranceAllowance),
+      housingAllowance: parseFloat(data.housingAllowance),
+      laborBenefit: parseFloat(data.laborBenefit)
+    };
+    onEditItem(updatedItem);
+    reset();
     onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bgColor={'gray.300'}>
         <ModalHeader>ویرایش مورد قراردادی</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FormControl mb={4}>
-            <FormLabel>سال</FormLabel>
-            <Select name="year" value={item.year} onChange={handleChange}>
-              <option value="">انتخاب سال</option>
-              {[2022, 2023, 2024, 2025].map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>حق اولاد</FormLabel>
-            <NumberInput value={item.childAllowance} onChange={(value) => handleNumberChange('childAllowance', value)}>
-              <NumberInputField name="childAllowance" />
-            </NumberInput>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>حق همسر</FormLabel>
-            <NumberInput value={item.spouseAllowance} onChange={(value) => handleNumberChange('spouseAllowance', value)}>
-              <NumberInputField name="spouseAllowance" />
-            </NumberInput>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>حق بیمه</FormLabel>
-            <NumberInput value={item.insuranceAllowance} onChange={(value) => handleNumberChange('insuranceAllowance', value)}>
-              <NumberInputField name="insuranceAllowance" />
-            </NumberInput>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>حق مسکن</FormLabel>
-            <NumberInput value={item.housingAllowance} onChange={(value) => handleNumberChange('housingAllowance', value)}>
-              <NumberInputField name="housingAllowance" />
-            </NumberInput>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>بن کارگری</FormLabel>
-            <NumberInput value={item.laborBenefit} onChange={(value) => handleNumberChange('laborBenefit', value)}>
-              <NumberInputField name="laborBenefit" />
-            </NumberInput>
-          </FormControl>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormControl mb={4}>
+              <FormLabel>سال</FormLabel>
+              <Select
+                {...register('year', { required: true })}
+                outline={'1px solid black'}
+              >
+                {[2022, 2023, 2024, 2025].map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>حق اولاد</FormLabel>
+              <NumberInput>
+                <NumberInputField
+                  {...register('childAllowance', { required: true })}
+                  outline={'1px solid black'}
+                />
+              </NumberInput>
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>حق همسر</FormLabel>
+              <NumberInput>
+                <NumberInputField
+                  {...register('spouseAllowance', { required: true })}
+                  outline={'1px solid black'}
+                />
+              </NumberInput>
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>حق بیمه</FormLabel>
+              <NumberInput>
+                <NumberInputField
+                  {...register('insuranceAllowance', { required: true })}
+                  outline={'1px solid black'}
+                />
+              </NumberInput>
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>حق مسکن</FormLabel>
+              <NumberInput>
+                <NumberInputField
+                  {...register('housingAllowance', { required: true })}
+                  outline={'1px solid black'}
+                />
+              </NumberInput>
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>بن کارگری</FormLabel>
+              <NumberInput>
+                <NumberInputField
+                  {...register('laborBenefit', { required: true })}
+                  outline={'1px solid black'}
+                />
+              </NumberInput>
+            </FormControl>
+            <ModalFooter>
+              <Button variant="ghost" onClick={onClose} bgColor={'blackAlpha.300'} borderRadius={5}>
+                لغو
+              </Button>
+              <Button colorScheme="blue" type="submit" ml={5} bgColor={'green.300'} borderRadius={5}>
+                ذخیره
+              </Button>
+            </ModalFooter>
+          </form>
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
-            ذخیره
-          </Button>
-          <Button variant="ghost" onClick={onClose}>لغو</Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

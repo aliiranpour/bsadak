@@ -8,21 +8,21 @@ const DetailPositionModal = ({ isOpen, onClose, position }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bgColor={'gray.200'}>
         <ModalHeader>جزئیات سمت</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Box mb={4}>
             <Text fontWeight="bold">نام سمت:</Text>
-            <Text>{position.name}</Text>
+            <Text>{position.Name}</Text>
           </Box>
           <Box mb={4}>
             <Text fontWeight="bold">توضیحات:</Text>
-            <Text>{position.description}</Text>
+            <Text>{position.Caption}</Text>
           </Box>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" onClick={onClose}>بستن</Button>
+          <Button colorScheme="teal" bgColor={'teal.600'} onClick={onClose} borderRadius={5}>بستن</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

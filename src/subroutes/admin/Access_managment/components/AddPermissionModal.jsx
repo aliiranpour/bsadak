@@ -3,21 +3,34 @@ import { useForm } from 'react-hook-form';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Input, Box
 } from '@chakra-ui/react';
+import axios from 'axios';
 
-const AddPermissionModal = ({ isOpen, onClose, onAddPermission, allPermissions }) => {
+const AddPermissionModal = ({ isOpen, onClose, onAddPermission }) => {
   const { register, handleSubmit, reset, setError, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
-    const { newPermission } = data;
-    if (allPermissions.includes(newPermission)) {
-      setError('newPermission', {
-        type: 'manual',
-        message: 'این دسترسی از قبل وجود دارد!',
+  const onSubmit = async (data) => {
+    const { Name, Code } = data;
+    try {
+      const response = await axios.post('https://api.bsadak.ir/api/admin/permision', {
+        Name,
+        Code
+      }, {
+        headers: {
+          'Authorization': ` ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json'
+        }
       });
-    } else {
-      onAddPermission(newPermission);
+      onAddPermission(response.data);
       reset();
       onClose();
+    } catch (error) {
+      console.error('Error adding permission', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        setError('Name', {
+          type: 'manual',
+          message: error.response.data.message,
+        });
+      }
     }
   };
 
@@ -31,11 +44,18 @@ const AddPermissionModal = ({ isOpen, onClose, onAddPermission, allPermissions }
           <form onSubmit={handleSubmit(onSubmit)}>
             <Input
               placeholder="نام دسترسی"
-              {...register('newPermission', { required: 'نام دسترسی الزامی است' })}
+              {...register('Name', { required: 'نام دسترسی الزامی است' })}
               mb={2}
               outline='1px solid black'
             />
-            {errors.newPermission && <Box color="red.500">{errors.newPermission.message}</Box>}
+            {errors.Name && <Box color="red.500">{errors.Name.message}</Box>}
+            <Input
+              placeholder="کد دسترسی"
+              {...register('Code', { required: 'کد دسترسی الزامی است' })}
+              mb={2}
+              outline='1px solid black'
+            />
+            {errors.Code && <Box color="red.500">{errors.Code.message}</Box>}
             <ModalFooter>
               <Button variant="ghost" onClick={onClose}>لغو</Button>
               <Button colorScheme="teal" mr={3} type="submit" borderRadius={5}>

@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import {
-  Box, Button, Heading, Table, Thead, Tbody, Tr, Th, Td, Flex, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, useBreakpointValue, useMediaQuery
+  Box, Button, Table, Thead, Tbody, Tr, Th, Td, Flex, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, useBreakpointValue, useMediaQuery, InputGroup, InputLeftElement, Input
 } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons';
+import { EditIcon, DeleteIcon, AddIcon, SearchIcon } from '@chakra-ui/icons';
 import AddContractualItemModal from './components/AddContractualItemModal';
 import EditContractualItemModal from './components/EditContractualItemModal';
 import DetailContractualItemModal from './components/DetailContractualItemModal';
@@ -17,6 +17,7 @@ const ContractualItemsManagement = () => {
   const [items, setItems] = useState(initialItems);
   const [editItem, setEditItem] = useState(null);
   const [detailItem, setDetailItem] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
   const { isOpen: isDetailOpen, onOpen: onDetailOpen, onClose: onDetailClose } = useDisclosure();
@@ -54,21 +55,50 @@ const ContractualItemsManagement = () => {
     onDetailOpen();
   };
 
+  const filteredItems = items.filter((item) =>
+    item.year.toString().includes(searchQuery) ||
+    item.childAllowance.toString().includes(searchQuery) ||
+    item.spouseAllowance.toString().includes(searchQuery) ||
+    item.insuranceAllowance.toString().includes(searchQuery) ||
+    item.housingAllowance.toString().includes(searchQuery) ||
+    item.laborBenefit.toString().includes(searchQuery)
+  );
+
   const buttonSize = useBreakpointValue({ base: 'sm', md: 'md' });
-  const headingFontSize = useBreakpointValue({ base: 'lg', md: 'xl' });
   const textFontSize = useBreakpointValue({ base: 'sm', md: 'md' });
-  const [isMobile] = useMediaQuery('(max-width: 568px)');
+  const [isMobile] = useMediaQuery('(max-width: 768px)');
 
   return (
-    <Box p={5}>
-      <Flex justifyContent="space-between" alignItems="center" mb={5} flexDirection={isMobile ? 'column' : 'row'} borderBottom='1px solid black' pb={5}>
-        <Heading fontSize={headingFontSize} mb={isMobile ? 4 : 0} fontFamily={yekan} >مدیریت موارد قراردادی</Heading>
-        <Button leftIcon={<AddIcon />} colorScheme="teal" onClick={onAddOpen} size={buttonSize} w={isMobile ? '100%' : 'auto'}>
+    <Box p={5} mt={10}>
+      <Flex justifyContent="space-between" alignItems="center" mb={5} flexDirection={isMobile ? 'column' : 'row'}>
+        <InputGroup mb={isMobile ? 4 : 0} w={isMobile ? '100%' : '80%'} h="50px" outline="1px solid black" borderRadius={5}>
+          <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.500" />} />
+          <Input
+            type="text"
+            placeholder="سال مورد قراردادی مورد نظر را وارد کنید"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            fontFamily={yekan}
+            h="50px"
+          />
+        </InputGroup>
+        <Button
+          leftIcon={<AddIcon />}
+          onClick={onAddOpen}
+          size={buttonSize}
+          w={isMobile ? '100%' : '30%'}
+          borderRadius={5}
+          mx={isMobile ? '10px' : '1.5rem'}
+          h="50px"
+          colorScheme="green"
+          color="white"
+          bgColor="green.700"
+        >
           ثبت مورد قراردادی
         </Button>
       </Flex>
-      <Box overflowX="auto">
-        <Table variant="simple">
+      <Box overflowX="auto" border="1px solid" borderColor="gray.200" borderRadius="10px">
+        <Table variant="striped" colorScheme="gray">
           <Thead>
             <Tr>
               <Th fontSize={textFontSize} textAlign="center" fontFamily={yekan}>سال</Th>
@@ -81,30 +111,36 @@ const ContractualItemsManagement = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {items.map((item, index) => (
-              <Tr key={item.id} bg={index % 2 === 0 ? '#B2F5EA' : 'white'} onClick={() => handleDetailClick(item)} cursor="pointer">
+            {filteredItems.map((item, index) => (
+              <Tr key={item.id} bg={index % 2 === 0 ? 'gray.50' : 'gray.200'} onClick={() => handleDetailClick(item)} cursor="pointer">
                 <Td fontSize={textFontSize} textAlign="center">{item.year}</Td>
                 <Td fontSize={textFontSize} textAlign="center">{item.childAllowance}</Td>
                 <Td fontSize={textFontSize} textAlign="center">{item.spouseAllowance}</Td>
                 <Td fontSize={textFontSize} textAlign="center">{item.insuranceAllowance}</Td>
                 <Td fontSize={textFontSize} textAlign="center">{item.housingAllowance}</Td>
                 <Td fontSize={textFontSize} textAlign="center">{item.laborBenefit}</Td>
-                <Td>
+                <Td textAlign="center">
                   <Flex justifyContent="center">
                     <Button
                       leftIcon={<EditIcon />}
                       size={buttonSize}
-                      colorScheme="blue"
+                      colorScheme="green"
                       onClick={(e) => { e.stopPropagation(); handleEditClick(item); }}
                       mr={2}
+                      bgColor="green.300"
+                      color="white"
+                      borderRadius={5}
                     >
                       ویرایش
                     </Button>
                     <Button
                       leftIcon={<DeleteIcon />}
                       size={buttonSize}
-                      colorScheme="red"
+                      colorScheme="blackAlpha"
                       onClick={(e) => { e.stopPropagation(); handleDeleteClick(item); }}
+                      bgColor="blackAlpha.800"
+                      color="white"
+                      borderRadius={5}
                     >
                       حذف
                     </Button>
@@ -149,10 +185,17 @@ const ContractualItemsManagement = () => {
               آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onDeleteClose}>
+              <Button ref={cancelRef} onClick={onDeleteClose} borderRadius={5} bgColor={'gray.300'}>
                 لغو
               </Button>
-              <Button colorScheme="red" onClick={handleDeleteItem} ml={3}>
+              <Button 
+                onClick={handleDeleteItem} 
+                ml={3}
+                bgColor="blackAlpha.800"
+                color="white"
+                borderRadius={5}
+                colorScheme="blackAlpha"
+                >
                 حذف
               </Button>
             </AlertDialogFooter>

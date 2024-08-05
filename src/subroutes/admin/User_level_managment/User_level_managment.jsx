@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import {
-  Box, Button, Heading, Flex, IconButton, Select, Table, Thead, Tbody, Tr, Th, Td, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter
+  Box, Button, Heading, Flex, IconButton, Table, Thead, Tbody, Tr, Th, Td, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter
 } from '@chakra-ui/react';
-import yekan from '../../../assets/font/BYekan/BYekan+.ttf'
+import yekan from '../../../assets/font/BYekan/BYekan+.ttf';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import AddLevelModal from './components/AddLevelModal';
 import EditLevelModal from './components/EditLevelModal';
@@ -33,7 +33,6 @@ const initialAccessLevels = [
 const UserLevelManagement = () => {
   const [accessLevels, setAccessLevels] = useState(initialAccessLevels);
   const [selectedLevel, setSelectedLevel] = useState(null);
-  const [selectedPermissions, setSelectedPermissions] = useState([]);
   const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
@@ -41,8 +40,7 @@ const UserLevelManagement = () => {
   const cancelRef = useRef();
 
   const handleDeletePermission = (permission) => {
-    const updatedPermissions = selectedPermissions.filter((p) => p !== permission);
-    setSelectedPermissions(updatedPermissions);
+    const updatedPermissions = selectedLevel.permissions.filter((p) => p !== permission);
     setSelectedLevel({
       ...selectedLevel,
       permissions: updatedPermissions
@@ -50,29 +48,20 @@ const UserLevelManagement = () => {
     setAccessLevels(accessLevels.map(level => level.name === selectedLevel.name ? { ...level, permissions: updatedPermissions } : level));
   };
 
-  const handleLevelChange = (e) => {
-    const level = accessLevels.find((l) => l.name === e.target.value);
-    setSelectedLevel(level);
-    setSelectedPermissions(level.permissions);
-  };
-
   const handleAddLevel = (newLevel) => {
     setAccessLevels([...accessLevels, newLevel]);
-    setSelectedLevel(null);
-    setSelectedPermissions([]);
   };
 
   const handleEditLevel = (updatedLevel) => {
     setAccessLevels(accessLevels.map(level => level.name === editLevel.name ? updatedLevel : level));
     setSelectedLevel(null);
-    setSelectedPermissions([]);
+    onEditClose();
   };
 
   const handleDeleteLevel = () => {
     const updatedLevels = accessLevels.filter(level => level.name !== editLevel.name);
     setAccessLevels(updatedLevels);
     setSelectedLevel(null);
-    setSelectedPermissions([]);
     onDeleteClose();
   };
 
@@ -86,53 +75,81 @@ const UserLevelManagement = () => {
     onDeleteOpen();
   };
 
+  const handleDetailsClick = (level) => {
+    setSelectedLevel(level);
+    onEditOpen();
+  };
+
   return (
     <Box p={5}>
       <Flex justifyContent="space-between" alignItems="center" mb={35}>
-        <Heading fontFamily={yekan} >سطوح کاربری</Heading>
+        <Heading fontFamily={yekan}>سطوح کاربری</Heading>
         <Button colorScheme="teal" onClick={onAddOpen}>
           افزودن سطح کاربری
         </Button>
       </Flex>
-      <Select onChange={handleLevelChange} mb={5} placeholder="سطح مورد نظر را انتخاب کنید">
-        {accessLevels.map((level) => (
-          <option key={level.name} value={level.name}>{level.name}</option>
-        ))}
-      </Select>
+      <Table variant="simple" mb={5}>
+        <Thead>
+          <Tr>
+            <Th>سطح کاربری</Th>
+            <Th>عملیات</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {accessLevels.map((level) => (
+            <Tr key={level.name}>
+              <Td>{level.name}</Td>
+              <Td>
+                <Button size="sm" colorScheme="blue" onClick={() => handleDetailsClick(level)} mr={2}>
+                  جزییات
+                </Button>
+                <Button size="sm" colorScheme="red" onClick={() => handleDeleteClick(level)}>
+                  حذف
+                </Button>
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
       {selectedLevel && (
-        <>
-          <Flex mb={5}>
-            <Button leftIcon={<EditIcon />} colorScheme="blue" onClick={() => handleEditClick(selectedLevel)} mr={2}>
-              ویرایش سطح کاربری
-            </Button>
-            <Button leftIcon={<DeleteIcon />} colorScheme="red" onClick={() => handleDeleteClick(selectedLevel)}>
-              حذف سطح کاربری
-            </Button>
-          </Flex>
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>میزان دسترسی</Th>
-                <Th>عملیات</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {selectedPermissions.map((permission) => (
-                <Tr key={permission}>
-                  <Td>{permission}</Td>
-                  <Td>
-                    <IconButton
-                      icon={<DeleteIcon />}
-                      size="sm"
-                      colorScheme="red"
-                      onClick={() => handleDeletePermission(permission)}
-                    />
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </>
+        <Modal isOpen={isEditOpen} onClose={onEditClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>جزئیات سطح {selectedLevel.name}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th>میزان دسترسی</Th>
+                    <Th>عملیات</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {selectedLevel.permissions.map((permission) => (
+                    <Tr key={permission}>
+                      <Td>{permission}</Td>
+                      <Td>
+                        <IconButton
+                          icon={<DeleteIcon />}
+                          size="sm"
+                          colorScheme="red"
+                          onClick={() => handleDeletePermission(permission)}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={() => handleEditClick(selectedLevel)}>
+                ویرایش سطح کاربری
+              </Button>
+              <Button variant="ghost" onClick={onEditClose}>بستن</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
       <AddLevelModal
         isOpen={isAddOpen}

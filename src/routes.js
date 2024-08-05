@@ -16,8 +16,8 @@ import Admin from "views/admin/admin";
 
 // Auth Imports
 import SignInCentered from "views/auth/signIn";
-import Member_managment from "subroutes/admin/Member_managment/Member_managment";
-import User_level_managment from "subroutes/admin/User_level_managment/User_level_managment";
+import MemberManagement from "subroutes/admin/Member_managment/Member_managment";
+import UserLevelManagement from "subroutes/admin/User_level_managment/User_level_managment";
 import PermissionManagement from "subroutes/admin/Access_managment/Access_managment";
 import CompanyManagement from "subroutes/personel/Add_new_company/company_mangment";
 import CategoryManagement from "subroutes/personel/add_category/CategoryManagement";
@@ -27,8 +27,28 @@ import NewEmployeeForm from "subroutes/personel/Add_personel/NewEmployeeForm";
 import EmployeeSettlement from "subroutes/personel/Personel_sattlement/Employee_sattlment";
 import ContractualItemsPage from "subroutes/personel/Registration_contractual_items/ContractualItems";
 import ShiftManagement from "subroutes/personel/add_shift/add_shift";
+import Home from "views/home/home";
+import Login from "views/auth/logIn/logIn";
 
 const routes = [
+  {
+    name: "خانه",
+    layout: "/",
+    path: "/",
+    component: Home,
+  },
+  {
+    name: "ورود",
+    layout: "/auth",
+    path: "/Login",
+    component: Login,
+  },
+  {
+    name: "ثبت نام",
+    layout: "/auth",
+    path: "/signUp",
+    component: Home,
+  },
   {
     name: "پیشخوان",
     layout: "/admin",
@@ -52,12 +72,12 @@ const routes = [
       {
         name: "مدیریت کاربران سایت",
         path: "/member_managment",
-        component: Member_managment,
+        component: MemberManagement,
       },
       {
         name: "مدیریت سطوح کاربری",
         path: "/member-level-managment",
-        component: User_level_managment,
+        component: UserLevelManagement,
       },
       {
         name: "مدیریت دسترسی ها",
@@ -123,7 +143,7 @@ const routes = [
         component: ShiftManagement,
       },
       {
-        name: "حضور غیاب",
+        name: "حضور غیاب ",
         path: "/present-absence",
         component: MainDashboard,
       },

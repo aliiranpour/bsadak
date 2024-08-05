@@ -113,7 +113,7 @@ export default function Dashboard(props) {
   const { onOpen } = useDisclosure();
   return (
     <RtlProvider>
-      <SidebarContext.Provider
+      {/* <SidebarContext.Provider
         value={{
           toggleSidebar,
           setToggleSidebar,
@@ -154,8 +154,8 @@ export default function Dashboard(props) {
           <Box>
             <Footer />
           </Box>
-        </Box>
-      </SidebarContext.Provider>
+        </Box> */}
+      {/* </SidebarContext.Provider> */}
     </RtlProvider>
   );
 }

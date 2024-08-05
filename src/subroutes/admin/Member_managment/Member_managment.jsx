@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Button,
@@ -29,41 +29,60 @@ import {
 import { EditIcon, DeleteIcon, AddIcon, SearchIcon } from '@chakra-ui/icons';
 import AddUserModal from './components/AddUsesr';
 import EditUserModal from './components/Edituser';
+import axios from 'axios';
 import yekan from '../../../assets/font/BYekan/BYekan+.ttf';
 
-const positions = [
-  { id: 1, name: 'admin' },
-  { id: 2, name: 'user' },
-  { id: 3, name: 'moderator' },
-];
-
 const MemberManagement = () => {
-  const initialData = [
-    { id: 1, first_name: 'وحید', last_name: 'رضوانی', username: 'vahidre20', password: 'vahidRE20##', position: 'admin', tel: '09923312951' },
-    { id: 2, first_name: 'علی', last_name: 'ایران پور', username: 'aliiranpour', password: 'aliiran', position: 'admin', tel: '09305182174' },
-  ];
-
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editUser, setEditUser] = useState(null);
   const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const cancelRef = useRef();
+  const [isMobile] = useMediaQuery('(max-width: 768px)');
 
-  const handleDeleteUser = () => {
-    setData(data.filter((user) => user.id !== editUser.id));
-    onDeleteClose();
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('https://api.bsadak.ir/api/admin/user', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('accessToken')
+        }
+      });
+      setData(response.data.data);
+    } catch (error) {
+      console.error('Error fetching data', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleDeleteUser = async () => {
+    try {
+      await axios.delete(`https://api.bsadak.ir/api/admin/user/${editUser._id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('accessToken')
+        }
+      });
+      fetchData();
+      onDeleteClose();
+    } catch (error) {
+      console.error('Error deleting user', error);
+    }
   };
 
   const handleEditUser = (updatedUser) => {
-    setData(data.map((user) => (user.id === updatedUser.id ? updatedUser : user)));
+    fetchData();
     setEditUser(null);
     onEditClose();
   };
 
   const handleAddUser = (newUser) => {
-    setData([...data, { ...newUser, id: data.length + 1 }]);
+    fetchData();
   };
 
   const handleEditClick = (user) => {
@@ -77,12 +96,11 @@ const MemberManagement = () => {
   };
 
   const filteredUsers = data.filter((user) =>
-    `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
+    `${user.Name} ${user.LastName}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const buttonSize = useBreakpointValue({ base: 'sm', md: 'md' });
   const textFontSize = useBreakpointValue({ base: 'sm', md: 'md' });
-  const [isMobile] = useMediaQuery('(max-width: 768px)');
 
   return (
     <Box p={5} mt={10}>
@@ -116,7 +134,7 @@ const MemberManagement = () => {
       {isMobile ? (
         <Stack spacing={4}>
           {filteredUsers.map((user, index) => (
-            <Box key={user.id} p={4} border="1px solid" borderColor="gray.200" borderRadius="10px" bg={index % 2 === 0 ? 'gray.50' : 'gray.200'}>
+            <Box key={user._id} p={4} border="1px solid" borderColor="gray.200" borderRadius="10px" bg={index % 2 === 0 ? 'gray.50' : 'gray.200'}>
               <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
@@ -125,7 +143,7 @@ const MemberManagement = () => {
                 </GridItem>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
-                    {user.id}
+                    {user._id}
                   </Text>
                 </GridItem>
                 <GridItem>
@@ -135,7 +153,7 @@ const MemberManagement = () => {
                 </GridItem>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
-                    {user.first_name}
+                    {user.Name}
                   </Text>
                 </GridItem>
                 <GridItem>
@@ -145,7 +163,7 @@ const MemberManagement = () => {
                 </GridItem>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
-                    {user.last_name}
+                    {user.LastName}
                   </Text>
                 </GridItem>
                 <GridItem>
@@ -155,7 +173,7 @@ const MemberManagement = () => {
                 </GridItem>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
-                    {user.username}
+                    {user.UserName}
                   </Text>
                 </GridItem>
                 <GridItem>
@@ -165,7 +183,7 @@ const MemberManagement = () => {
                 </GridItem>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
-                    {user.password}
+                    {user.Password}
                   </Text>
                 </GridItem>
                 <GridItem>
@@ -175,7 +193,7 @@ const MemberManagement = () => {
                 </GridItem>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
-                    {user.position}
+                    {user.UserType.Title}
                   </Text>
                 </GridItem>
                 <GridItem>
@@ -185,7 +203,7 @@ const MemberManagement = () => {
                 </GridItem>
                 <GridItem>
                   <Text fontSize={textFontSize} fontFamily={yekan} textAlign="left">
-                    {user.tel}
+                    {user.Phone}
                   </Text>
                 </GridItem>
               </Grid>
@@ -250,27 +268,27 @@ const MemberManagement = () => {
             </Thead>
             <Tbody>
               {filteredUsers.map((user, index) => (
-                <Tr key={user.id} bg={index % 2 === 0 ? 'gray.50' : 'gray.200'}>
+                <Tr key={user._id} bg={index % 2 === 0 ? 'gray.50' : 'gray.200'}>
                   <Td fontSize={textFontSize} textAlign="center">
-                    {user.id}
+                    {user._id}
                   </Td>
                   <Td fontSize={textFontSize} textAlign="center">
-                    {user.first_name}
+                    {user.Name}
                   </Td>
                   <Td fontSize={textFontSize} textAlign="center">
-                    {user.last_name}
+                    {user.LastName}
                   </Td>
                   <Td fontSize={textFontSize} textAlign="center">
-                    {user.username}
+                    {user.UserName}
                   </Td>
                   <Td fontSize={textFontSize} textAlign="center">
-                    {user.password}
+                    {user.Password}
                   </Td>
                   <Td fontSize={textFontSize} textAlign="center">
-                    {user.position}
+                    {user.UserType.Title}
                   </Td>
                   <Td fontSize={textFontSize} textAlign="center">
-                    {user.tel}
+                    {user.Phone}
                   </Td>
                   <Td textAlign="center">
                     <Flex justifyContent="center">
@@ -310,7 +328,6 @@ const MemberManagement = () => {
         isOpen={isAddOpen}
         onClose={onAddClose}
         onAddUser={handleAddUser}
-        positions={positions}
       />
 
       {editUser && (
@@ -319,7 +336,7 @@ const MemberManagement = () => {
           onClose={onEditClose}
           onEditUser={handleEditUser}
           user={editUser}
-          positions={positions}
+          positions={data} // این قسمت را اضافه کنید تا مقادیر مربوط به positions به صورت صحیح به EditUserModal منتقل شود
         />
       )}
 

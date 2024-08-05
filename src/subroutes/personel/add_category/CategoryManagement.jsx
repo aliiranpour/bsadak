@@ -1,47 +1,88 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  Box, Button, Heading, Table, Thead, Tbody, Tr, Th, Td, Flex, IconButton, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, useBreakpointValue, useMediaQuery
+  Box, Button, Table, Thead, Tbody, Tr, Th, Td, Flex, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, useBreakpointValue, useMediaQuery, InputGroup, InputLeftElement, Input
 } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons';
+import { EditIcon, DeleteIcon, AddIcon, SearchIcon } from '@chakra-ui/icons';
 import AddCategoryModal from './components/AddCategoryModal';
 import EditCategoryModal from './components/EditCategoryModal';
 import DetailCategoryModal from './components/DetailCategoryModal';
+import axios from 'axios';
 import yekan from '../../../assets/font/BYekan/BYekan+.ttf';
 
-const initialCategories = [
-  { id: 1, company: 'شرکت الف', name: 'دسته بندی ۱', description: 'توضیحات دسته بندی ۱' },
-  { id: 2, company: 'شرکت ب', name: 'دسته بندی ۲', description: 'توضیحات دسته بندی ۲' }
-];
-
-const initialCompanies = [
-  { id: 1, name: 'شرکت الف' },
-  { id: 2, name: 'شرکت ب' }
-];
-
 const CategoryManagement = () => {
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState([]);
   const [editCategory, setEditCategory] = useState(null);
   const [detailCategory, setDetailCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
   const { isOpen: isDetailOpen, onOpen: onDetailOpen, onClose: onDetailClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const cancelRef = useRef();
+  const [isMobile] = useMediaQuery('(max-width: 768px)');
 
-  const handleAddCategory = (newCategory) => {
-    setCategories([...categories, newCategory]);
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('https://api.bsadak.ir/api/category', {
+        headers: {
+          'Authorization': localStorage.getItem('accessToken'),
+          'Content-Type': 'application/json'
+        }
+      });
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories', error);
+    }
   };
 
-  const handleEditCategory = (updatedCategory) => {
-    setCategories(categories.map(c => c.id === updatedCategory.id ? updatedCategory : c));
-    setEditCategory(null);
-    onEditClose();
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleDeleteCategory = async () => {
+    try {
+      await axios.delete(`https://api.bsadak.ir/api/category/${editCategory._id}`, {
+        headers: {
+          'Authorization': localStorage.getItem('accessToken'),
+          'Content-Type': 'application/json'
+        }
+      });
+      fetchCategories();
+      onDeleteClose();
+    } catch (error) {
+      console.error('Error deleting category', error);
+    }
   };
 
-  const handleDeleteCategory = () => {
-    setCategories(categories.filter(c => c.id !== editCategory.id));
-    setEditCategory(null);
-    onDeleteClose();
+  const handleEditCategory = async (updatedCategory) => {
+    try {
+      const response = await axios.patch(`https://api.bsadak.ir/api/category/${editCategory._id}`, updatedCategory, {
+        headers: {
+          'Authorization': localStorage.getItem('accessToken'),
+          'Content-Type': 'application/json'
+        }
+      });
+      fetchCategories();
+      setEditCategory(null);
+      onEditClose();
+    } catch (error) {
+      console.error('Error editing category', error);
+    }
+  };
+
+  const handleAddCategory = async (newCategory) => {
+    try {
+      const response = await axios.post('https://api.bsadak.ir/api/category', newCategory, {
+        headers: {
+          'Authorization': localStorage.getItem('accessToken'),
+          'Content-Type': 'application/json'
+        }
+      });
+      fetchCategories();
+      onAddClose();
+    } catch (error) {
+      console.error('Error adding category', error);
+    }
   };
 
   const handleEditClick = (category) => {
@@ -59,23 +100,44 @@ const CategoryManagement = () => {
     onDetailOpen();
   };
 
-  const buttonSize = useBreakpointValue({ base: 'sm', md: 'md' });
-  const headingFontSize = useBreakpointValue({ base: 'lg', md: 'xl' });
-  const textFontSize = useBreakpointValue({ base: 'sm', md: 'md' });
-  const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const filteredCategories = categories.filter((category) =>
+    category.Name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const truncateText = (text, length) => (text.length > length ? `${text.substring(0, length)}...` : text);
+  const buttonSize = useBreakpointValue({ base: 'sm', md: 'md' });
+  const textFontSize = useBreakpointValue({ base: 'sm', md: 'md' });
 
   return (
     <Box p={5}>
-      <Flex justifyContent="space-between" alignItems="center" mb={5} flexDirection={isMobile ? 'column' : 'row'} borderBottom='1px solid black' pb={5}>
-        <Heading fontSize={headingFontSize} mb={isMobile ? 4 : 0} fontFamily={yekan}>مدیریت دسته بندی‌ها</Heading>
-        <Button leftIcon={<AddIcon />} colorScheme="teal" onClick={onAddOpen} size={buttonSize} w={isMobile ? '100%' : 'auto'}>
+      <Flex justifyContent="space-between" alignItems="center" mb={5} flexDirection={isMobile ? 'column' : 'row'}>
+        <InputGroup mb={isMobile ? 4 : 0} w={isMobile ? '100%' : '80%'} h="50px" outline="1px solid black" borderRadius={5}>
+          <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.500" />} />
+          <Input
+            type="text"
+            placeholder="نام دسته بندی مورد نظر را وارد کنید"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            fontFamily={yekan}
+            h="50px"
+          />
+        </InputGroup>
+        <Button
+          leftIcon={<AddIcon />}
+          onClick={onAddOpen}
+          size={buttonSize}
+          w={isMobile ? '100%' : '30%'}
+          borderRadius={5}
+          mx={isMobile ? '10px' : '1.5rem'}
+          h="50px"
+          colorScheme="green"
+          color="white"
+          bgColor="green.700"
+        >
           افزودن دسته بندی جدید
         </Button>
       </Flex>
-      <Box overflowX="auto">
-        <Table variant="simple">
+      <Box overflowX="auto" border="1px solid" borderColor="gray.200" borderRadius="10px">
+        <Table variant="striped" colorScheme="gray">
           <Thead>
             <Tr>
               <Th fontSize={textFontSize} fontFamily={yekan} textAlign="center">نام شرکت</Th>
@@ -85,27 +147,33 @@ const CategoryManagement = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {categories.map((category) => (
-              <Tr key={category.id} onClick={() => handleRowClick(category)} cursor="pointer">
-                <Td fontSize={textFontSize} textAlign="center">{category.company}</Td>
-                <Td fontSize={textFontSize} textAlign="center">{category.name}</Td>
-                <Td fontSize={textFontSize} textAlign="center">{truncateText(category.description, 20)}</Td>
+            {filteredCategories.map((category, index) => (
+              <Tr key={category._id} bg={index % 2 === 0 ? 'gray.50' : 'gray.200'} onClick={() => handleRowClick(category)} cursor="pointer">
+                <Td fontSize={textFontSize} textAlign="center">{category.Company.Name}</Td>
+                <Td fontSize={textFontSize} textAlign="center">{category.Name}</Td>
+                <Td fontSize={textFontSize} textAlign="center">{category.Caption}</Td>
                 <Td>
                   <Flex justifyContent="center">
                     <Button
                       leftIcon={<EditIcon />}
                       size={buttonSize}
-                      colorScheme="blue"
+                      colorScheme="green"
                       onClick={(e) => { e.stopPropagation(); handleEditClick(category); }}
                       mr={2}
+                      bgColor="green.300"
+                      color="white"
+                      borderRadius={5}
                     >
                       ویرایش
                     </Button>
                     <Button
                       leftIcon={<DeleteIcon />}
                       size={buttonSize}
-                      colorScheme="red"
+                      colorScheme="blackAlpha"
                       onClick={(e) => { e.stopPropagation(); handleDeleteClick(category); }}
+                      bgColor="blackAlpha.800"
+                      color="white"
+                      borderRadius={5}
                     >
                       حذف
                     </Button>
@@ -121,7 +189,6 @@ const CategoryManagement = () => {
         isOpen={isAddOpen}
         onClose={onAddClose}
         onAddCategory={handleAddCategory}
-        companies={initialCompanies}
       />
 
       {editCategory && (
@@ -130,7 +197,6 @@ const CategoryManagement = () => {
           onClose={onEditClose}
           onEditCategory={handleEditCategory}
           initialCategory={editCategory}
-          companies={initialCompanies}
         />
       )}
 
@@ -152,10 +218,17 @@ const CategoryManagement = () => {
               آیا مطمئن هستید که می‌خواهید این دسته بندی را حذف کنید؟
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onDeleteClose}>
+              <Button ref={cancelRef} onClick={onDeleteClose} borderRadius={5} bgColor={'gray.300'}>
                 لغو
               </Button>
-              <Button colorScheme="red" onClick={handleDeleteCategory} ml={3}>
+              <Button 
+                onClick={handleDeleteCategory} 
+                ml={3}
+                bgColor="blackAlpha.800"
+                color="white"
+                borderRadius={5}
+                colorScheme="blackAlpha"
+              >
                 حذف
               </Button>
             </AlertDialogFooter>

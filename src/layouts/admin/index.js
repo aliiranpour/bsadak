@@ -5,8 +5,8 @@ import Footer from 'components/footer/FooterAdmin.js';
 import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
-import React, { useState, useEffect } from 'react';
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import routes from 'routes.js';
 import { RtlProvider } from 'components/rtlProvider/RtlProvider.js';
 
@@ -22,41 +22,42 @@ export default function Dashboard(props) {
   };
 
   const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === '/admin') {
-        if (prop.subRoutes && prop.subRoutes.length > 0) {
-          return prop.subRoutes.map((subProp, subKey) => (
-            <Route
-              path={prop.layout + subProp.path}
-              component={subProp.component}
-              key={key + '-' + subKey}
-            />
-          ));
-        } else if (prop.component) {
-          return (
-            <Route
-              path={prop.layout + prop.path}
-              component={prop.component}
-              key={key}
-            />
-          );
-        }
+    return routes.map((route, idx) => {
+      if (route.subRoutes) {
+        return route.subRoutes.map((subRoute, subIdx) => (
+          <Route
+            path={`${route.layout}${subRoute.path}`}
+            element={<subRoute.component />}
+            key={`${idx}-${subIdx}`}
+          />
+        ));
       }
-      return null;
+      return (
+        <Route
+          path={`${route.layout}${route.path}`}
+          element={<route.component />}
+          exact
+          key={idx}
+        />
+      );
     });
   };
 
   const getActiveRoute = (routes) => {
     let activeRoute = 'Default Brand Text';
+    const currentPath = location.pathname;
+
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].subRoutes && routes[i].subRoutes.length > 0) {
         for (let j = 0; j < routes[i].subRoutes.length; j++) {
-          if (location.pathname.indexOf(routes[i].layout + routes[i].subRoutes[j].path) !== -1) {
+          const fullPath = routes[i].layout + routes[i].layout + routes[i].subRoutes[j].path;
+          if (currentPath.startsWith(fullPath)) {
             return routes[i].subRoutes[j].name;
           }
         }
       }
-      if (location.pathname.indexOf(routes[i].layout + routes[i].path) !== -1) {
+      const fullPath = routes[i].layout + routes[i].layout + routes[i].path;
+      if (currentPath.startsWith(fullPath)) {
         return routes[i].name;
       }
     }
@@ -134,7 +135,7 @@ export default function Dashboard(props) {
             <Box>
               <Navbar
                 onOpen={onOpen}
-                logoText={'Horizon UI Dashboard PRO'}
+                logoText={'sepand UI Dashboard'}
                 brandText={getActiveRoute(routes)}
                 secondary={getActiveNavbar(routes)}
                 message={getActiveNavbarText(routes)}
@@ -146,10 +147,10 @@ export default function Dashboard(props) {
 
           {getRoute() ? (
             <Box mx='auto' p={{ base: '20px', md: '30px' }} pe='20px' minH='100vh' pt='50px' mt={20}>
-              <Switch>
+              <Routes>
                 {getRoutes(routes)}
-                <Redirect from='/' to='/admin/counter' />
-              </Switch>
+                <Route path="*" element={<div>صفحه مورد نظر یافت نشد</div>} />
+              </Routes>
             </Box>
           ) : null}
           <Box>

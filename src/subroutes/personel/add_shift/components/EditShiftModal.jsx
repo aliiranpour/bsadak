@@ -1,60 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import {
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
-  Button, FormControl, FormLabel, Input, Checkbox
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Switch
 } from '@chakra-ui/react';
 
 const EditShiftModal = ({ isOpen, onClose, onEditShift, initialShift }) => {
-  const [shift, setShift] = useState(initialShift);
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
 
   useEffect(() => {
-    setShift(initialShift);
-  }, [initialShift]);
+    if (initialShift) {
+      setValue('name', initialShift.Name);
+      setValue('startTime', initialShift.Work.Start);
+      setValue('endTime', initialShift.Work.End);
+      setValue('status', initialShift.Active);
+    }
+  }, [initialShift, setValue]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setShift(prevState => ({
-      ...prevState,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
-
-  const handleSubmit = () => {
-    onEditShift(shift);
+  const onSubmit = (data) => {
+    const updatedShift = {
+      ...initialShift,
+      Name: data.name,
+      Work: {
+        Start: data.startTime,
+        End: data.endTime
+      },
+      Active: data.status
+    };
+    onEditShift(updatedShift);
+    reset();
     onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bgColor={'gray.100'}>
         <ModalHeader>ویرایش شیفت</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FormControl mb={4}>
-            <FormLabel>نام شیفت</FormLabel>
-            <Input name="name" value={shift.name} onChange={handleChange} placeholder="نام شیفت" />
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>ساعت شروع</FormLabel>
-            <Input name="startTime" type="time" value={shift.startTime} onChange={handleChange} placeholder="ساعت شروع" />
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel>ساعت پایان</FormLabel>
-            <Input name="endTime" type="time" value={shift.endTime} onChange={handleChange} placeholder="ساعت پایان" />
-          </FormControl>
-          <FormControl mb={4}>
-            <Checkbox name="status" isChecked={shift.status} onChange={handleChange}>
-              انجام شده
-            </Checkbox>
-          </FormControl>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormControl mb={4} isInvalid={errors.name}>
+              <FormLabel>نام شیفت</FormLabel>
+              <Input
+                {...register('name', { required: 'نام شیفت الزامی است' })}
+                placeholder="نام شیفت"
+              />
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.startTime}>
+              <FormLabel>ساعت شروع</FormLabel>
+              <Input
+                type="time"
+                {...register('startTime', { required: 'ساعت شروع الزامی است' })}
+              />
+            </FormControl>
+            <FormControl mb={4} isInvalid={errors.endTime}>
+              <FormLabel>ساعت پایان</FormLabel>
+              <Input
+                type="time"
+                {...register('endTime', { required: 'ساعت پایان الزامی است' })}
+              />
+            </FormControl>
+            <FormControl display="flex" alignItems="center" mb={4}>
+              <FormLabel htmlFor="status" mb="0">
+                وضعیت
+              </FormLabel>
+              <Switch id="status" {...register('status')} />
+            </FormControl>
+            <ModalFooter>
+              <Button variant="ghost" onClick={onClose} bgColor={'blackAlpha.300'} borderRadius={5}>
+                لغو
+              </Button>
+              <Button colorScheme="teal" type="submit" ml={5} bgColor={'green.300'} borderRadius={5}>
+                ذخیره
+              </Button>
+            </ModalFooter>
+          </form>
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
-            ذخیره
-          </Button>
-          <Button variant="ghost" onClick={onClose}>لغو</Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );
