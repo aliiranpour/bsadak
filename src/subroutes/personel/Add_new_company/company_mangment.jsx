@@ -201,8 +201,8 @@ const CompanyManagement = () => {
                     <Button
                       leftIcon={<DeleteIcon />}
                       size={buttonSize}
-                      colorScheme="blackAlpha"
                       onClick={(e) => { e.stopPropagation(); handleDeleteClick(company); }}
+                      colorScheme="blackAlpha"
                       bgColor="blackAlpha.800"
                       color="white"
                       borderRadius={5}

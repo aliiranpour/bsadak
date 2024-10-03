@@ -37,6 +37,7 @@ export function SidebarLinks(props) {
     return routes
       .filter((route) => route.layout === "/admin")
       .map((route, index) => {
+        if (route.hidden) return null
         if (route.category) {
           return (
             <React.Fragment key={index}>

@@ -29,7 +29,14 @@ const CategoryManagement = () => {
           'Content-Type': 'application/json'
         }
       });
-      setCategories(response.data);
+      const data = response.data;
+      if (Array.isArray(data)) {
+        setCategories(data);
+      } else if (data && Array.isArray(data.data)) {
+        setCategories(data.data);
+      } else {
+        console.error('Invalid data format:', data);
+      }
     } catch (error) {
       console.error('Error fetching categories', error);
     }
@@ -56,7 +63,7 @@ const CategoryManagement = () => {
 
   const handleEditCategory = async (updatedCategory) => {
     try {
-      const response = await axios.patch(`https://api.bsadak.ir/api/category/${editCategory._id}`, updatedCategory, {
+      await axios.patch(`https://api.bsadak.ir/api/category/${editCategory._id}`, updatedCategory, {
         headers: {
           'Authorization': localStorage.getItem('accessToken'),
           'Content-Type': 'application/json'
@@ -72,7 +79,7 @@ const CategoryManagement = () => {
 
   const handleAddCategory = async (newCategory) => {
     try {
-      const response = await axios.post('https://api.bsadak.ir/api/category', newCategory, {
+      await axios.post('https://api.bsadak.ir/api/category', newCategory, {
         headers: {
           'Authorization': localStorage.getItem('accessToken'),
           'Content-Type': 'application/json'
@@ -100,9 +107,9 @@ const CategoryManagement = () => {
     onDetailOpen();
   };
 
-  const filteredCategories = categories.filter((category) =>
+  const filteredCategories = Array.isArray(categories) ? categories.filter((category) =>
     category.Name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) : [];
 
   const buttonSize = useBreakpointValue({ base: 'sm', md: 'md' });
   const textFontSize = useBreakpointValue({ base: 'sm', md: 'md' });
@@ -149,7 +156,7 @@ const CategoryManagement = () => {
           <Tbody>
             {filteredCategories.map((category, index) => (
               <Tr key={category._id} bg={index % 2 === 0 ? 'gray.50' : 'gray.200'} onClick={() => handleRowClick(category)} cursor="pointer">
-                <Td fontSize={textFontSize} textAlign="center">{category.Company.Name}</Td>
+                <Td fontSize={textFontSize} textAlign="center" >{category.Company.Name}</Td>
                 <Td fontSize={textFontSize} textAlign="center">{category.Name}</Td>
                 <Td fontSize={textFontSize} textAlign="center">{category.Caption}</Td>
                 <Td>

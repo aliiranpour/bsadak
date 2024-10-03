@@ -29,6 +29,18 @@ import ContractualItemsPage from "subroutes/personel/Registration_contractual_it
 import ShiftManagement from "subroutes/personel/add_shift/add_shift";
 import Home from "views/home/home";
 import Login from "views/auth/logIn/logIn";
+import RegisterPersonelForm from "subroutes/personel/register_personel/Rgister-personel-managment";
+import PersonnelManagement from "subroutes/personel/Personel_managment/Personel_managment";
+import PenaltyForm from "subroutes/personel/Penalty/Penaltymanagment";
+import PenaltyList from "subroutes/personel/Penaltylist/Penaltylist";
+import WorkList from "subroutes/personel/Works/Workslist";
+import SalaryForm from "subroutes/personel/payment/SalaryForm";
+import PaymentList from "subroutes/personel/payment/SalaryList.";
+import PersonnelDetails from "subroutes/personel/Personel_managment/Personel_detail/Personel_detail";
+import AttendanceList from "subroutes/personel/AttendanceList/AttendanceList ";
+import AddOvertime from "subroutes/personel/add_extra_work/Add_extra_work";
+import Attendance from "subroutes/personel/register_attendance/register_attendance";
+import AccountManagement from "subroutes/personel/Personel_managment/hesab/Hesab";
 
 const routes = [
   {
@@ -100,7 +112,7 @@ const routes = [
       {
         name: "مدیریت پرسنل",
         path: "/personel_managing",
-        component: MainDashboard,
+        component: PersonnelManagement ,
       },
       {
         name: "افزودن شرکت جدید",
@@ -120,7 +132,7 @@ const routes = [
       {
         name: "ثبت پرسنل جدید",
         path: "/register-personel",
-        component: NewEmployeeForm,
+        component: RegisterPersonelForm ,
       },
       {
         name: "لیست پرسنل",
@@ -145,27 +157,27 @@ const routes = [
       {
         name: "حضور غیاب ",
         path: "/present-absence",
-        component: MainDashboard,
+        component: Attendance,
       },
       {
         name: "لیست حضور غیاب",
         path: "/present-absence-list",
-        component: MainDashboard,
+        component: AttendanceList,
       },
       {
         name: "افزودن اضافه کار",
         path: "/add-extra-work",
-        component: MainDashboard,
+        component: AddOvertime,
       },
       {
         name: "ثبت جریمه",
         path: "/register-fine",
-        component: MainDashboard,
+        component: PenaltyForm ,
       },
       {
         name: "لیست جریمه‌ها",
         path: "/fines-list",
-        component: MainDashboard,
+        component: PenaltyList,
       },
       {
         name: "ثبت تعطیلی",
@@ -180,19 +192,32 @@ const routes = [
       {
         name: "لیست کارکردها",
         path: "/functions-list",
-        component: MainDashboard,
+        component: WorkList,
       },
       {
         name: "ثبت پرداختی",
         path: "/register-payment",
-        component: MainDashboard,
+        component: SalaryForm ,
       },
       {
         name: "لیست پرداختی‌ها",
         path: "/payments-list",
-        component: MainDashboard,
+        component: PaymentList,
       },
     ],
+  },
+  {
+    name: "جزئیات پرسنل", 
+    layout: "/admin",
+    path: "/personel_managing/personnel-details/:personId", 
+    component: PersonnelDetails ,
+    hidden: true,
+  },  {
+    name: "حساب پرسنل", 
+    layout: "/admin",
+    path: "/admin/admin/personel_managing/hesab/:groupId/:monthNumber", 
+    component: AccountManagement ,
+    hidden: true,
   },
   {
     name: "قرارداد",
